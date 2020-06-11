@@ -1,0 +1,223 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+    <style>
+
+    table 
+    {
+        width: 100%;
+        font: 17px Calibri;
+    }
+    table, th, td 
+    {
+        border: solid 1px #DDD;
+        border-collapse: collapse;
+        padding: 2px 3px;
+        text-align: center;
+    }
+    tr{
+        margin-top: 10px;
+    }
+    </style>
+    <script type="text/javascript">
+
+var HttpClient = function() {
+ this.get = function(aUrl, aCallback) {
+ var anHttpRequest = new XMLHttpRequest();
+ anHttpRequest.onreadystatechange = function() { 
+ if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
+ aCallback(anHttpRequest.responseText);
+ }
+ anHttpRequest.open( "GET", aUrl, true ); 
+ anHttpRequest.send( null ); 
+ }
+ }
+ var theurl='/test/index';
+ var client = new HttpClient();
+
+ client.get(theurl, function(response) { 
+ var response1 = JSON.parse(response);
+//  console.log(response1);
+
+ for(var i in response1){
+     document.getElementById("tbody").innerHTML += `<tr id="delete-${response1[i]['id']}"><td id="title">${response1[i]['name']}</td>
+     
+     <td id="mobile">${response1[i]['mobile']}</td>
+     <td><button type="button" onClick="onEdit(${response1[i]['id']})">Edit</button>
+             <button type="button" id="delete"   onClick="onDelete(${response1[i]['id']})">Delete</button></td></tr>`;
+ }
+ 
+ }); 
+
+
+ function fun(){
+
+     var name = document.getElementById("name").value;
+     
+     
+     var mobile = document.getElementById("contact").value;
+
+    //  console.log(name);
+    //  console.log(mobile);
+
+    var action = document.getElementById("submit").value;
+    console.log(action);
+    
+     
+  data ={
+        'name':name,
+        'mobile':mobile,
+    }
+
+    if(action==="Add"){
+
+     $.ajax({
+            url:"/test/add",
+            method:"POST",
+            data:data,
+            success:function(data,status)
+            {
+
+                // console.log(data);
+                document.getElementById("tbody").innerHTML += `<tr id="delete-${data[2]['id']}"><td id="title">${data[2]['name']}</td>
+     
+     <td id="mobile">${data[2]['mobile']}</td>
+     <td><button type="button" onClick="onEdit(${data[2]['id']})">Edit</button>
+             <button type="button"   onClick="onDelete(${data[2]['id']})">Delete</button></td></tr>`; 
+             resetForm();
+
+                 },
+
+            error:function(errormessage){
+                alert(errormessage.responseText);
+            }
+    });
+} else if(action==="Update"){
+
+     var id = document.getElementById("editid").value;
+    $.ajax({
+    url:"/test/edit/"+id,
+    method:"POST",
+    data:data,
+    
+    success:function(data)
+    {
+        var row = document.getElementById("delete-"+id);
+
+        var name = row.childNodes[0];
+        name.innerHTML = `${data[2]['name']}`;
+        // console.log(name);
+
+        var mobile = row.childNodes[row.childNodes.length - 3];
+        // console.log(mobile);
+
+        mobile.innerHTML = `${data[2]['mobile']}`
+
+        // var actions = row.childNodes[row.childNodes.length - 1];
+        // console.log(actions);
+   
+   
+      
+             resetForm();
+
+        
+    //  fetch_data();
+     
+    },
+   });
+
+}
+
+}
+
+function resetForm(){
+     
+     document.getElementById("name").value = "";
+     document.getElementById("contact").value = "";
+
+    
+
+    }
+    
+
+ function onEdit(id){
+    //  var name = document.getElementById("title");
+    //  var mobile = document.getElementById("mobile");
+
+    var row = document.getElementById("delete-"+id);
+
+    var name = row.childNodes[0];
+    // console.log(name);
+
+    var mobile = row.childNodes[row.childNodes.length - 3];
+
+
+    // console.log(mobile);
+
+    document.getElementById("name").value = name.innerHTML;
+
+    document.getElementById("contact").value = mobile.innerHTML;
+
+    document.getElementById("submit").value = "Update";
+
+    document.getElementById("submit").innerHTML = "Update";
+
+    document.getElementById("editid").value= id;
+
+     
+
+      }
+
+ function onDelete(id){
+     console.log(id);
+    $.ajax({
+    url:"/test/delete/"+id,
+    method:"POST",
+    
+    success:function(data)
+    {
+        document.getElementById("delete-"+id).remove();
+       
+    //  fetch_data();
+     
+    },
+   });
+ }
+
+    </script>
+</head>
+<body>
+
+Name: <input type="text" name="name" id="name">
+
+Mobile: <input type="text" name="contact" id="contact">
+
+
+<input type="hidden" name="hidden" id="editid" >
+
+<button type="button" onclick="fun()"id="submit" value="Add"> Add</button><br><br>
+
+
+<table id="employee">
+
+    <thead>
+
+        <tr>
+            <th>Name</th>
+            <th>Mobile</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody id="tbody">
+        
+    </tbody>
+
+</table>
+    
+</body>
+</html>
