@@ -69,69 +69,95 @@ var HttpClient = function() {
     console.log(action);
     
      
-  data ={
-        'name':name,
-        'mobile':mobile,
-    }
+//   data ={
+//         'name':name,
+//         'mobile':mobile,
+//     }
 
     if(action==="Add"){
 
-     $.ajax({
-            url:"/test/add",
-            method:"POST",
-            data:data,
-            success:function(data,status)
-            {
+    
 
-                // console.log(data);
-                document.getElementById("tbody").innerHTML += `<tr id="delete-${data[2]['id']}"><td id="title">${data[2]['name']}</td>
+    var formData = new FormData();
+
+    formData.append("name",name);
+
+    formData.append("mobile",mobile);
+
+
+    
+    console.log(formData);
+
+    var request = new XMLHttpRequest();
+    var url = "/test/add"
+request.open("POST", url);
+request.send(formData);
+
+request.onreadystatechange = processRequest;
+ function processRequest(e) {
+ if (request.readyState == 4 && request.status == 200) {
+ // alert(xhr.responseText);
+ var response1 = JSON.parse(request.responseText);
+
+ document.getElementById("tbody").innerHTML += `<tr id="delete-${response1[2]['id']}"><td id="title">${response1[2]['name']}</td>
      
-     <td id="mobile">${data[2]['mobile']}</td>
-     <td><button type="button" onClick="onEdit(${data[2]['id']})">Edit</button>
-             <button type="button"   onClick="onDelete(${data[2]['id']})">Delete</button></td></tr>`; 
-             resetForm();
+      <td id="mobile">${response1[2]['mobile']}</td>
+      <td><button type="button" onClick="onEdit(${response1[2]['id']})">Edit</button>
+         <button type="button"   onClick="onDelete(${response1[2]['id']})">Delete</button></td></tr>`; 
+        resetForm();
+//  console.log(response1);
+ 
+ }
+ }
 
-                 },
-
-            error:function(errormessage){
-                alert(errormessage.responseText);
-            }
-    });
+    
 } else if(action==="Update"){
 
-     var id = document.getElementById("editid").value;
-    $.ajax({
-    url:"/test/edit/"+id,
-    method:"POST",
-    data:data,
+
+
+    var id = document.getElementById("editid").value;
+
+
+    var formData = new FormData();
+
+    formData.append("name",name);
+
+    formData.append("mobile",mobile);
+
+
     
-    success:function(data)
-    {
-        var row = document.getElementById("delete-"+id);
+    // console.log(formData);
 
-        var name = row.childNodes[0];
-        name.innerHTML = `${data[2]['name']}`;
-        // console.log(name);
+    var request = new XMLHttpRequest();
+    var url = "/test/edit/"+id;
+    request.open("POST", url);
+    request.send(formData);
 
-        var mobile = row.childNodes[row.childNodes.length - 3];
-        // console.log(mobile);
+    request.onreadystatechange = processRequest;
+    function processRequest(e) {
+    if (request.readyState == 4 && request.status == 200) {
+    // alert(xhr.responseText);
+    var response1 = JSON.parse(request.responseText);
 
-        mobile.innerHTML = `${data[2]['mobile']}`
+    var row = document.getElementById("delete-"+id);
 
-        // var actions = row.childNodes[row.childNodes.length - 1];
-        // console.log(actions);
-   
-   
-      
-             resetForm();
+    var name = row.childNodes[0];
+    name.innerHTML = `${response1[2]['name']}`;
+    // console.log(name);
+
+    var mobile = row.childNodes[row.childNodes.length - 3];
+    // console.log(mobile);
+
+    mobile.innerHTML = `${response1[2]['mobile']}`
+    
+            resetForm();
+    //  console.log(response1);
+    
+    }
+    }
 
         
-    //  fetch_data();
-     
-    },
-   });
-
-}
+        }
 
 }
 
@@ -175,18 +201,32 @@ function resetForm(){
 
  function onDelete(id){
      console.log(id);
-    $.ajax({
-    url:"/test/delete/"+id,
-    method:"POST",
+   
     
-    success:function(data)
-    {
+
+    var request = new XMLHttpRequest();
+    var url = "/test/delete/"+id;
+
+    request.open("POST", url);
+   
+    request.send();
+
+    request.onreadystatechange = processRequest;
+    function processRequest(e) {
+    if (request.readyState == 4 && request.status == 200) {
+    // alert(xhr.responseText);
+
         document.getElementById("delete-"+id).remove();
-       
-    //  fetch_data();
+
+
+
+    //  console.log(response1);
+    
+    }
+    }
      
-    },
-   });
+    
+   
  }
 
     </script>
