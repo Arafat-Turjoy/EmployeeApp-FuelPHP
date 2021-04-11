@@ -1,263 +1,197 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Contact Form</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
     <style>
-
-    table 
-    {
+      table {
         width: 100%;
         font: 17px Calibri;
-    }
-    table, th, td 
-    {
-        border: solid 1px #DDD;
+      }
+      table,
+      th,
+      td {
+        border: solid 1px #ddd;
         border-collapse: collapse;
         padding: 2px 3px;
         text-align: center;
-    }
-    tr{
+      }
+      tr {
         margin-top: 10px;
-    }
+      }
     </style>
     <script type="text/javascript">
+      var request = new XMLHttpRequest();
+      var url = "/test/index";
+      request.open("GET", url);
+      request.send(null);
 
-var HttpClient = function() {
- this.get = function(aUrl, aCallback) {
- var anHttpRequest = new XMLHttpRequest();
- anHttpRequest.onreadystatechange = function() { 
- if (anHttpRequest.readyState == 4 && anHttpRequest.status == 200)
- aCallback(anHttpRequest.responseText);
- }
- anHttpRequest.open( "GET", aUrl, true ); 
- anHttpRequest.send( null ); 
- }
- }
- var theurl='/test/index';
- var client = new HttpClient();
+      request.onreadystatechange = processRequest;
+      function processRequest(e) {
+        if (request.readyState == 4 && request.status == 200) {
+          var response1 = JSON.parse(request.responseText);
 
- client.get(theurl, function(response) { 
- var response1 = JSON.parse(response);
-//  console.log(response1);
-
- for(var i in response1){
-     document.getElementById("tbody").innerHTML += `<tr id="delete-${response1[i]['id']}"><td id="title">${response1[i]['name']}</td>
-     
-     <td id="mobile">${response1[i]['mobile']}</td>
-     <td><button type="button" onClick="onEdit(${response1[i]['id']})">Edit</button>
-             <button type="button" id="delete"   onClick="onDelete(${response1[i]['id']})">Delete</button></td></tr>`;
- }
- 
- }); 
-
-
- function fun(){
-
-     var name = document.getElementById("name").value;
-     
-     
-     var mobile = document.getElementById("contact").value;
-
-    //  console.log(name);
-    //  console.log(mobile);
-
-    var action = document.getElementById("submit").value;
-    console.log(action);
-    
-     
-//   data ={
-//         'name':name,
-//         'mobile':mobile,
-//     }
-
-    if(action==="Add"){
-
-    
-
-    var formData = new FormData();
-
-    formData.append("name",name);
-
-    formData.append("mobile",mobile);
-
-
-    
-    console.log(formData);
-
-    var request = new XMLHttpRequest();
-    var url = "/test/add"
-request.open("POST", url);
-request.send(formData);
-
-request.onreadystatechange = processRequest;
- function processRequest(e) {
- if (request.readyState == 4 && request.status == 200) {
- // alert(xhr.responseText);
- var response1 = JSON.parse(request.responseText);
-
- document.getElementById("tbody").innerHTML += `<tr id="delete-${response1[2]['id']}"><td id="title">${response1[2]['name']}</td>
-     
-      <td id="mobile">${response1[2]['mobile']}</td>
-      <td><button type="button" onClick="onEdit(${response1[2]['id']})">Edit</button>
-         <button type="button"   onClick="onDelete(${response1[2]['id']})">Delete</button></td></tr>`; 
-        resetForm();
-//  console.log(response1);
- 
- }
- }
-
-    
-} else if(action==="Update"){
-
-
-
-    var id = document.getElementById("editid").value;
-
-
-    var formData = new FormData();
-
-    formData.append("name",name);
-
-    formData.append("mobile",mobile);
-
-
-    
-    // console.log(formData);
-
-    var request = new XMLHttpRequest();
-    var url = "/test/edit/"+id;
-    request.open("POST", url);
-    request.send(formData);
-
-    request.onreadystatechange = processRequest;
-    function processRequest(e) {
-    if (request.readyState == 4 && request.status == 200) {
-    // alert(xhr.responseText);
-    var response1 = JSON.parse(request.responseText);
-
-    var row = document.getElementById("delete-"+id);
-
-    var name = row.childNodes[0];
-    name.innerHTML = `${response1[2]['name']}`;
-    // console.log(name);
-
-    var mobile = row.childNodes[row.childNodes.length - 3];
-    // console.log(mobile);
-
-    mobile.innerHTML = `${response1[2]['mobile']}`
-    
-            resetForm();
-    //  console.log(response1);
-    
-    }
-    }
-
-        
+          for (var i in response1) {
+            document.getElementById(
+              "tbody"
+            ).innerHTML += `<tr id="delete-${response1[i]["id"]}"><td id="title">${response1[i]["name"]}</td>
+                 
+         <td id="mobile">${response1[i]["mobile"]}</td>
+        <td><button type="button" onClick="onEdit(${response1[i]["id"]})">Edit</button>
+         <button type="button" id="delete"   onClick="onDelete(${response1[i]["id"]})">Delete</button></td></tr>`;
+          }
         }
-
-}
-
-function resetForm(){
-     
-     document.getElementById("name").value = "";
-     document.getElementById("contact").value = "";
-
-    
-
-    }
-    
-
- function onEdit(id){
-    //  var name = document.getElementById("title");
-    //  var mobile = document.getElementById("mobile");
-
-    var row = document.getElementById("delete-"+id);
-
-    var name = row.childNodes[0];
-    // console.log(name);
-
-    var mobile = row.childNodes[row.childNodes.length - 3];
-
-
-    // console.log(mobile);
-
-    document.getElementById("name").value = name.innerHTML;
-
-    document.getElementById("contact").value = mobile.innerHTML;
-
-    document.getElementById("submit").value = "Update";
-
-    document.getElementById("submit").innerHTML = "Update";
-
-    document.getElementById("editid").value= id;
-
-     
-
       }
 
- function onDelete(id){
-     console.log(id);
-   
-    
+      function fun() {
+        var name = document.getElementById("name").value;
 
-    var request = new XMLHttpRequest();
-    var url = "/test/delete/"+id;
+        var mobile = document.getElementById("contact").value;
 
-    request.open("POST", url);
-   
-    request.send();
+        var action = document.getElementById("submit").value;
+        console.log(action);
 
-    request.onreadystatechange = processRequest;
-    function processRequest(e) {
-    if (request.readyState == 4 && request.status == 200) {
-    // alert(xhr.responseText);
+        if (action === "Add") {
+          var formData = new FormData();
 
-        document.getElementById("delete-"+id).remove();
+          formData.append("name", name);
 
+          formData.append("mobile", mobile);
 
+          console.log(formData);
 
-    //  console.log(response1);
-    
-    }
-    }
-     
-    
-   
- }
+          var request = new XMLHttpRequest();
+          var url = "/test/add";
+          request.open("POST", url);
+          request.send(formData);
 
-    </script>
-</head>
-<body>
+          request.onreadystatechange = processRequest;
+          function processRequest(e) {
+            if (request.readyState == 4 && request.status == 200) {
+              var response1 = JSON.parse(request.responseText);
 
-Name: <input type="text" name="name" id="name">
-
-Mobile: <input type="text" name="contact" id="contact">
-
-
-<input type="hidden" name="hidden" id="editid" >
-
-<button type="button" onclick="fun()"id="submit" value="Add"> Add</button><br><br>
-
-
-<table id="employee">
-
-    <thead>
-
-        <tr>
-            <th>Name</th>
-            <th>Mobile</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody id="tbody">
+              document.getElementById(
+                "tbody"
+              ).innerHTML += `<tr id="delete-${response1[2]["id"]}"><td id="title">${response1[2]["name"]}</td>
         
-    </tbody>
+                <td id="mobile">${response1[2]["mobile"]}</td>
+                 <td><button type="button" onClick="onEdit(${response1[2]["id"]})">Edit</button>
+                <button type="button"   onClick="onDelete(${response1[2]["id"]})">Delete</button></td></tr>`;
 
-</table>
-    
-</body>
+              resetForm();
+            }
+          }
+        } else if (action === "Update") {
+          var id = document.getElementById("editid").value;
+
+          var formData = new FormData();
+
+          formData.append("name", name);
+
+          formData.append("mobile", mobile);
+
+          var request = new XMLHttpRequest();
+          var url = "/test/edit/" + id;
+          request.open("POST", url);
+          request.send(formData);
+
+          request.onreadystatechange = processRequest;
+          function processRequest(e) {
+            if (request.readyState == 4 && request.status == 200) {
+              // alert(xhr.responseText);
+              var response1 = JSON.parse(request.responseText);
+
+              var row = document.getElementById("delete-" + id);
+
+              var name = row.childNodes[0];
+              name.innerHTML = `${response1[2]["name"]}`;
+              // console.log(name);
+
+              var mobile = row.childNodes[row.childNodes.length - 3];
+              // console.log(mobile);
+
+              mobile.innerHTML = `${response1[2]["mobile"]}`;
+
+              resetForm();
+              //  console.log(response1);
+            }
+          }
+        }
+      }
+
+      function resetForm() {
+        document.getElementById("name").value = "";
+        document.getElementById("contact").value = "";
+        document.getElementById("submit").innerHTML = "Add";
+        document.getElementById("submit").value = "Add";
+      }
+
+      function onEdit(id) {
+        //  var name = document.getElementById("title");
+        //  var mobile = document.getElementById("mobile");
+
+        var row = document.getElementById("delete-" + id);
+
+        var name = row.childNodes[0];
+        // console.log(name);
+
+        var mobile = row.childNodes[row.childNodes.length - 3];
+
+        // console.log(mobile);
+
+        document.getElementById("name").value = name.innerHTML;
+
+        document.getElementById("contact").value = mobile.innerHTML;
+
+        document.getElementById("submit").value = "Update";
+
+        document.getElementById("submit").innerHTML = "Update";
+
+        document.getElementById("editid").value = id;
+      }
+
+      function onDelete(id) {
+        var request = new XMLHttpRequest();
+        var url = "/test/delete/" + id;
+
+        request.open("POST", url);
+
+        request.send();
+
+        request.onreadystatechange = processRequest;
+        function processRequest(e) {
+          if (request.readyState == 4 && request.status == 200) {
+            // alert(xhr.responseText);
+
+            document.getElementById("delete-" + id).remove();
+            resetForm();
+          }
+        }
+      }
+    </script>
+  </head>
+  <body>
+    Name: <input type="text" name="name" id="name" />
+
+    Mobile: <input type="text" name="contact" id="contact" />
+
+    <input type="hidden" name="hidden" id="editid" />
+
+    <button type="button" onclick="fun()" id="submit" value="Add">Add</button
+    ><br /><br />
+
+    <table id="employee">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Mobile</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </body>
 </html>
